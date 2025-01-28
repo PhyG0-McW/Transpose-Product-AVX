@@ -125,9 +125,9 @@ void multiply(int n, int32_t input[n][n], int32_t output[n][n]) {
 
 int main() {
     const int smallSize = 100;
-    const int mediumSize = 500;
-    const int largeSize = 800;
-    const int iterations = 5;
+    const int mediumSize = 300;
+    const int largeSize = 500;
+    const int iterations = 20;
 
      int32_t (*input)[smallSize] = malloc(smallSize * smallSize * sizeof(int32_t));
      int32_t (*medium)[mediumSize] = malloc(mediumSize * mediumSize * sizeof(int32_t));
