@@ -7,12 +7,6 @@
 #define MAX_TEST_CASES 10
 #define MAX_NAME_LENGTH 50
 
-#define COLOR_RESET "\033[0m"
-#define COLOR_YELLOW "\033[33m"
-#define COLOR_GREEN "\033[32m"
-#define COLOR_RED "\033[31m"
-#define COLOR_BOLD "\033[1m"
-
 // Helper functions
 void printMatrix(int n, int32_t matrix[n][n]) {
     for (int i = 0; i < n; i++) {
@@ -97,9 +91,8 @@ typedef struct {
 } FunctionStats;
 
 void print_separator(int width) {
-    printf(COLOR_BOLD);
     for (int i = 0; i < width; i++) printf("-");
-    printf("\n" COLOR_RESET);
+    printf("\n" );
 }
 
 void print_centered(const char* text, int width) {
@@ -127,8 +120,8 @@ void compare_performance(
     print_centered("PERFORMANCE COMPARISON", TABLE_WIDTH);
     print_separator(TABLE_WIDTH);
     
-    printf(COLOR_YELLOW "Total test cases: %d\n", num_test_cases);
-    printf("Iterations per test: %d\n" COLOR_RESET, iterations);
+    printf( "Total test cases: %d\n", num_test_cases);
+    printf("Iterations per test: %d\n" , iterations);
     print_separator(TABLE_WIDTH);
     
     printf("%-20s | %-15s | %-15s | %-15s | %-15s\n", 
@@ -152,7 +145,7 @@ void compare_performance(
         
         if (validate_func != NULL) {
             if (!validate_func(tc->size, result1.output, result2.output)) {
-                printf(COLOR_RED "WARNING: Output validation failed for test case %d!\n" COLOR_RESET, i + 1);
+                printf( "WARNING: Output validation failed for test case %d!\n" , i + 1);
             }
         }
         
@@ -192,15 +185,12 @@ void compare_performance(
     
     double overall_speedup = stats2.avg_time / stats1.avg_time;
     if (overall_speedup > 1.0) {
-        printf(COLOR_BOLD COLOR_GREEN "\nOverall: %s is %.2fx faster than %s\n" COLOR_RESET,
+        printf(  "\nOverall: %s is %.2fx faster than %s\n" ,
                func1_name, overall_speedup, func2_name);
     } else {
-        printf(COLOR_BOLD COLOR_RED "\nOverall: %s is %.2fx slower than %s\n" COLOR_RESET,
+        printf(  "\nOverall: %s is %.2fx slower than %s\n" ,
                func1_name, 1.0 / overall_speedup, func2_name);
     }
 }
-
-
-
 
 #endif
