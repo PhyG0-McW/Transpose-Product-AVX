@@ -19,11 +19,13 @@ void transpose_avx128(int n, int32_t input[n][n], int32_t output[n][n]) {
             __m128i row3 = _mm_loadu_si128((__m128i*)&input[i + 3][j]);
 
             // Transpose 4x4 block using SIMD operations
+            // Interleave two rows (1-1) elements
             __m128i temp0 = _mm_unpacklo_epi32(row0, row1);
             __m128i temp1 = _mm_unpacklo_epi32(row2, row3);
             __m128i temp2 = _mm_unpackhi_epi32(row0, row1);
             __m128i temp3 = _mm_unpackhi_epi32(row2, row3);
 
+            // Interleave two rows (2-2) elements
             __m128i result0 = _mm_unpacklo_epi64(temp0, temp1);
             __m128i result1 = _mm_unpackhi_epi64(temp0, temp1);
             __m128i result2 = _mm_unpacklo_epi64(temp2, temp3);
@@ -59,7 +61,7 @@ int main() {
     const int mediumSize = 500;
     const int largeSize = 1000;
 
-    const int iterations = 50;
+    const int iterations = 300;
 
      int32_t (*input)[smallSize] = malloc(smallSize * smallSize * sizeof(int32_t));
      int32_t (*medium)[mediumSize] = malloc(mediumSize * mediumSize * sizeof(int32_t));

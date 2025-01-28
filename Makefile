@@ -36,14 +36,14 @@ $(BUILD_DIR):
 
 # Transpose AVX-128 target
 $(TRANSPOSE_AVX128_TARGET): $(TRANSPOSE_AVX128_SRC) $(COMMON_DIR)/common.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -mavx $(INCLUDES) $< -o $@
+	$(CC) $(CFLAGS) -mavx $(INCLUDES) $< -o $@ -lm
 
 # Transpose AVX-256 target
 $(TRANSPOSE_AVX256_TARGET): $(TRANSPOSE_AVX256_SRC) $(COMMON_DIR)/common.h | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -mavx2 -mavx $(INCLUDES) $< -o $@
+	$(CC) $(CFLAGS) -mavx2 -mavx $(INCLUDES) $< -o $@ -lm
 
 ${PRODUCT_TARGET}: ${PRODUCT_SRC} $(COMMON_DIR)/common.h | $(BUILD_DIR) 
-	$(CC) $(CFLAGS) -mavx2 -mavx $(INCLUDES) $< -o $@
+	$(CC) $(CFLAGS) -mavx2 -mavx $(INCLUDES) $< -o $@ -lm
 
 # Clean target
 .PHONY: clean

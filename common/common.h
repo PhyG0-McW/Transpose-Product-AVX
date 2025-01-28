@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <math.h>
 
 #define MAX_TEST_CASES 10
 #define MAX_NAME_LENGTH 50
@@ -115,6 +116,7 @@ void compare_performance(
     FunctionStats stats1 = {0}, stats2 = {0};
     strncpy(stats1.func_name, func1_name, MAX_NAME_LENGTH-1);
     strncpy(stats2.func_name, func2_name, MAX_NAME_LENGTH-1);
+    double overall_speedup = 1.0;
     
     print_separator(TABLE_WIDTH);
     print_centered("PERFORMANCE COMPARISON", TABLE_WIDTH);
@@ -138,6 +140,8 @@ void compare_performance(
         stats2.times[i] = result2.time_taken;
         
         double speedup = result2.time_taken / result1.time_taken;
+
+        overall_speedup *= speedup;
         
         printf("%-20s | %4d x %-8d | %13.6f | %13.6f | %13.2fx\n",
                tc->description, tc->size, tc->size,
@@ -157,33 +161,30 @@ void compare_performance(
     // Calculate statistics
     for (int i = 0; i < num_test_cases; i++) {
         // Function 1 stats
-        stats1.avg_time += stats1.times[i];
         stats1.min_time = (i == 0) ? stats1.times[i] : 
                          (stats1.times[i] < stats1.min_time ? stats1.times[i] : stats1.min_time);
         stats1.max_time = (i == 0) ? stats1.times[i] : 
                          (stats1.times[i] > stats1.max_time ? stats1.times[i] : stats1.max_time);
         
         // Function 2 stats
-        stats2.avg_time += stats2.times[i];
         stats2.min_time = (i == 0) ? stats2.times[i] : 
                          (stats2.times[i] < stats2.min_time ? stats2.times[i] : stats2.min_time);
         stats2.max_time = (i == 0) ? stats2.times[i] : 
                          (stats2.times[i] > stats2.max_time ? stats2.times[i] : stats2.max_time);
+                    
     }
     
-    stats1.avg_time /= num_test_cases;
-    stats2.avg_time /= num_test_cases;
-    
+    overall_speedup = pow(overall_speedup, (1.0 / (double)num_test_cases));
+
     printf("\nSUMMARY STATISTICS:\n");
-    printf("%-20s | %-15s | %-15s | %-15s\n", "Function", "Min Time", "Avg Time", "Max Time");
+    printf("%-20s | %-15s |  %-15s\n", "Function", "Min Time", "Max Time");
     print_separator(TABLE_WIDTH);
-    printf("%-20s | %13.6f | %13.6f | %13.6f\n",
-           stats1.func_name, stats1.min_time, stats1.avg_time, stats1.max_time);
-    printf("%-20s | %13.6f | %13.6f | %13.6f\n",
-           stats2.func_name, stats2.min_time, stats2.avg_time, stats2.max_time);
+    printf("%-20s | %13.6f | %13.6f\n",
+           stats1.func_name, stats1.min_time, stats1.max_time);
+    printf("%-20s | %13.6f | %13.6f\n",
+           stats2.func_name, stats2.min_time, stats2.max_time);
     print_separator(TABLE_WIDTH);
     
-    double overall_speedup = stats2.avg_time / stats1.avg_time;
     if (overall_speedup > 1.0) {
         printf(  "\nOverall: %s is %.2fx faster than %s\n" ,
                func1_name, overall_speedup, func2_name);

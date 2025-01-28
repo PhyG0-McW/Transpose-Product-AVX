@@ -9,8 +9,10 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
     int block_limit_i = (n / 8) * 8;
     int block_limit_j = (n / 8) * 8;
 
+    // Transpose 8x8 matricies and put each result in transposed position
     for (int i = 0; i < block_limit_i; i += 8) {
         for (int j = 0; j < block_limit_j; j += 8) {
+            // load 8x8 matrix 
             __m256i row0 = _mm256_loadu_si256((__m256i*)&input[i + 0][j]);
             __m256i row1 = _mm256_loadu_si256((__m256i*)&input[i + 1][j]);
             __m256i row2 = _mm256_loadu_si256((__m256i*)&input[i + 2][j]);
@@ -20,6 +22,7 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
             __m256i row6 = _mm256_loadu_si256((__m256i*)&input[i + 6][j]);
             __m256i row7 = _mm256_loadu_si256((__m256i*)&input[i + 7][j]);
 
+            // Interleave two rows (1-1) elements
             __m256i temp0 = _mm256_unpacklo_epi32(row0, row1);
             __m256i temp1 = _mm256_unpackhi_epi32(row0, row1);
             __m256i temp2 = _mm256_unpacklo_epi32(row2, row3);
@@ -29,6 +32,8 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
             __m256i temp6 = _mm256_unpacklo_epi32(row6, row7);
             __m256i temp7 = _mm256_unpackhi_epi32(row6, row7);
 
+
+            // Interleave two rows (2-2) elements
             __m256i q0 = _mm256_unpacklo_epi64(temp0, temp2);
             __m256i q1 = _mm256_unpackhi_epi64(temp0, temp2);
             __m256i q2 = _mm256_unpacklo_epi64(temp1, temp3);
@@ -37,6 +42,10 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
             __m256i q5 = _mm256_unpackhi_epi64(temp4, temp6);
             __m256i q6 = _mm256_unpacklo_epi64(temp5, temp7);
             __m256i q7 = _mm256_unpackhi_epi64(temp5, temp7);
+
+            // Permutate two 256-bit lanes with controller 
+            // 0x20 -> 0001 0000 choose lower half in first lane and upper half in second lane
+            // 0x31 -> 0011 0001 choose upper half in first lane andn upper half in second lane
 
             __m256i result0 = _mm256_permute2x128_si256(q0, q4, 0x20);
             __m256i result1 = _mm256_permute2x128_si256(q1, q5, 0x20);
@@ -47,6 +56,7 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
             __m256i result6 = _mm256_permute2x128_si256(q2, q6, 0x31);
             __m256i result7 = _mm256_permute2x128_si256(q3, q7, 0x31);
 
+            // Store the final result in transposed position in output matrix
             _mm256_storeu_si256((__m256i*)&output[j + 0][i], result0);
             _mm256_storeu_si256((__m256i*)&output[j + 1][i], result1);
             _mm256_storeu_si256((__m256i*)&output[j + 2][i], result2);
@@ -58,12 +68,16 @@ void transpose_avx256(int n, int32_t input[n][n], int32_t output[n][n]) {
         }
     }
 
+    // Handle the remaining elements 
+
+    //Remaining columns to right
     for (int i = 0; i < block_limit_i; i++) {
         for (int j = block_limit_j; j < n; j++) {
             output[j][i] = input[i][j];
         }
     }
 
+    // Remaining rows at bottom
     for (int i = block_limit_i; i < n; i++) {
         for (int j = 0; j < n; j++) {
             output[j][i] = input[i][j];
@@ -75,7 +89,7 @@ int main() {
     const int smallSize = 100;
     const int mediumSize = 500;
     const int largeSize = 1000;
-    const int iterations = 100;
+    const int iterations = 300;
 
      int32_t (*input)[smallSize] = malloc(smallSize * smallSize * sizeof(int32_t));
      int32_t (*medium)[mediumSize] = malloc(mediumSize * mediumSize * sizeof(int32_t));
