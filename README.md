@@ -22,7 +22,7 @@ To compile and execute the comparison tests, run:
 make run
 ```
 
-### Clearn build files
+### Clean build files
 
 To remove generated build files, use:
 
