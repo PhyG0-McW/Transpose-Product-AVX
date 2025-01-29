@@ -1,4 +1,13 @@
-#include "main.h"
+#ifndef AVX_256
+#define AVX_256 
+
+#include <stdint.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <immintrin.h>
+#include <string.h>
+#include <sys/time.h>
+#include "common.h"
 
 void transpose_avx256(int n, int32_t *input, int32_t *output) {
     int block_limit_i = (n / 8) * 8;
@@ -73,45 +82,4 @@ void transpose_avx256(int n, int32_t *input, int32_t *output) {
     }
 }
 
-
-int main() {
-    const int smallSize = 100;
-    const int mediumSize = 300;
-    const int largeSize = 500;
-    const int iterations = 20;
-
-     int32_t *input = (int32_t*)malloc(smallSize * smallSize * sizeof(int32_t));
-     int32_t *medium = (int32_t*)malloc(mediumSize * mediumSize * sizeof(int32_t));
-     int32_t *large = (int32_t*)malloc(largeSize * largeSize * sizeof(int32_t));
-
-     TestCase test_cases[3] = {
-        {
-            .size = smallSize,
-            .input = input,
-            .description = "Small Matrix"
-        },
-        {
-            .size = mediumSize,
-            .input = medium,
-            .description = "Medium Matrix"
-        },
-        {
-            .size = largeSize,
-            input = large,
-            .description = "Large Matrix"
-        }
-    };
-
-    fillMatrix(smallSize, input);
-    fillMatrix(mediumSize, medium);
-    fillMatrix(largeSize, input);
-
-    compare_performance(
-            "AVX-256 Multiplication", "Scalar Multiplication",
-            multiply, multiplyOriginal,
-            test_cases, 3, iterations,
-            validate_func
-    );
-
-    return 0;
-}
+#endif
